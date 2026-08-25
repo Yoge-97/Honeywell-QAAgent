@@ -20,3 +20,7 @@ jobs:
         run: |
           python --version
           pip --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
