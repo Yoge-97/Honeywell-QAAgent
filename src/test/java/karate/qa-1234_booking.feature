@@ -1,26 +1,24 @@
-Feature: QA-1234 - Submit Booking Form
+Feature: QA-1234 Booking Form Submission
   As a guest, I want to submit the booking form so that I can complete my booking.
 
   Background:
-    * configure headers = { 'Content-Type': 'application/json' }
+    * url baseUrl
+    * path '/booking'
 
-  @TC-001
-  Scenario: TC-001 - Fill all mandatory fields and submit the booking form
-    Given I am on the booking form page
-    When I fill in all mandatory fields
-    And I submit the booking form
-    Then the success message should be displayed
+  Scenario: TC-001 Fill all mandatory fields and submit the booking form
+    Given request { name: 'John Doe', number: '1234567890' }
+    When method post
+    Then status 200
+    And match response.successMessage == '#present'
 
-  @TC-002
-  Scenario: TC-002 - Leave the Name field empty and submit the booking form
-    Given I am on the booking form page
-    When I leave the Name field empty
-    And I submit the booking form
-    Then the success message should not be displayed
+  Scenario: TC-002 Leave the Name field empty and submit the booking form
+    Given request { name: '', number: '1234567890' }
+    When method post
+    Then status 400
+    And match response.successMessage != '#present'
 
-  @TC-003
-  Scenario: TC-003 - Leave the Number field empty and submit the booking form
-    Given I am on the booking form page
-    When I leave the Number field empty
-    And I submit the booking form
-    Then the success message should not be displayed
+  Scenario: TC-003 Leave the Number field empty and submit the booking form
+    Given request { name: 'John Doe', number: '' }
+    When method post
+    Then status 400
+    And match response.successMessage != '#present'
