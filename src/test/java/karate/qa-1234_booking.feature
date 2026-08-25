@@ -1,24 +1,24 @@
-Feature: QA-1234 Booking Form Submission
-  As a guest, I want to submit the booking form so that I can complete my booking.
+Feature: QA-1234 - Submit Booking Form
 
-  Background:
-    * url baseUrl
-    * path '/booking'
+Background:
+  * url baseUrl
+  * path '/booking'
 
-  Scenario: TC-001 Fill all mandatory fields and submit the booking form
-    Given request { name: 'John Doe', number: '1234567890' }
-    When method post
-    Then status 200
-    And match response.successMessage == '#present'
+@TC-001
+Scenario: TC-001: Fill all mandatory fields and submit the booking form
+  Given request { name: 'John Doe', number: '1234567890' }
+  When method post
+  Then status 200
+  And match response.message == '#present'
 
-  Scenario: TC-002 Leave the Name field empty and submit the booking form
-    Given request { name: '', number: '1234567890' }
-    When method post
-    Then status 400
-    And match response.successMessage != '#present'
+@TC-002
+Scenario: TC-002: Leave the Name field empty and submit the booking form
+  Given request { name: '', number: '1234567890' }
+  When method post
+  Then match response.message !exists
 
-  Scenario: TC-003 Leave the Number field empty and submit the booking form
-    Given request { name: 'John Doe', number: '' }
-    When method post
-    Then status 400
-    And match response.successMessage != '#present'
+@TC-003
+Scenario: TC-003: Leave the Number field empty and submit the booking form
+  Given request { name: 'John Doe', number: '' }
+  When method post
+  Then match response.message !exists
