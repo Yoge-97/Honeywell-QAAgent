@@ -1,0 +1,24 @@
+Ticket: QA-1234
+
+User Story:
+As a guest, I want to submit the booking form so that I can complete my booking.
+
+Test Cases:
+
+TC-001:
+Fill all mandatory fields and submit the booking form.
+
+Expected:
+Success message should be displayed.
+
+TC-002:
+Leave the Name field empty and submit the booking form.
+
+Expected:
+Success message should not be displayed.
+
+TC-003:
+Leave the Number field empty and submit the booking form.
+
+Expected:
+Success message should not be displayed.
