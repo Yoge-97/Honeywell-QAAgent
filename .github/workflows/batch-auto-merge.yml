@@ -1,0 +1,50 @@
+name: QA Auto Merge
+
+on:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  check-approvals:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check all PR approvals
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking all PRs with qa-auto-merge label..."
+
+          PRS=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --label "qa-auto-merge" \
+            --state open \
+            --limit 100 \
+            --json number,reviewDecision)
+
+          echo "PRs found:"
+          echo "$PRS"
+
+          TOTAL=$(echo "$PRS" | jq 'length')
+
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "No PRs found with qa-auto-merge label."
+            exit 1
+          fi
+
+          NOT_APPROVED=$(echo "$PRS" | jq '[.[] | select(.reviewDecision != "APPROVED")] | length')
+
+          echo "Total PRs: $TOTAL"
+          echo "PRs not approved: $NOT_APPROVED"
+
+          if [ "$NOT_APPROVED" -eq 0 ]; then
+            echo "ALL PRs ARE APPROVED"
+            echo "Ready for automated merge."
+          else
+            echo "NOT ALL PRs ARE APPROVED"
+            echo "Automated merge will NOT happen."
+            exit 1
+          fi
