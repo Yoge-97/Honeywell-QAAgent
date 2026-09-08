@@ -1,0 +1,89 @@
+name: PR Review Email Notification
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Send review notification
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ASSIGNEE_EMAIL: ${{ secrets.ASSIGNEE_EMAIL }}
+
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REVIEW_STATE: ${{ github.event.review.state }}
+
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          from email.message import EmailMessage
+
+          state = os.environ["REVIEW_STATE"]
+
+          if state == "approved":
+              subject = "Pull Request Approved"
+              message = (
+                  "The Pull Request has been approved.\n\n"
+                  f"Pull Request: {os.environ['PR_URL']}\n"
+              )
+
+          elif state == "changes_requested":
+              subject = "Pull Request Changes Requested"
+              message = (
+                  "Changes have been requested for the "
+                  "Pull Request.\n\n"
+                  f"Pull Request: {os.environ['PR_URL']}\n"
+              )
+
+          else:
+              print(f"Review state '{state}' does not require an email.")
+              raise SystemExit(0)
+
+          email = EmailMessage()
+
+          email["From"] = os.environ["SMTP_USERNAME"]
+          email["To"] = os.environ["ASSIGNEE_EMAIL"]
+          email["Subject"] = subject
+
+          email.set_content(
+              f"Hello,\n\n"
+              f"{message}\n"
+              f"PR Title: {os.environ['PR_TITLE']}\n\n"
+              f"Regards,\n"
+              f"QA Creator Agent"
+          )
+
+          with smtplib.SMTP(
+              os.environ["SMTP_HOST"],
+              int(os.environ["SMTP_PORT"])
+          ) as server:
+
+              server.starttls()
+
+              server.login(
+                  os.environ["SMTP_USERNAME"],
+                  os.environ["SMTP_PASSWORD"]
+              )
+
+              server.send_message(email)
+
+          print("Notification email sent successfully.")
+          PY
