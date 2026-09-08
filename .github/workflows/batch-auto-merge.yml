@@ -2,81 +2,55 @@ name: QA Auto Merge
 
 on:
   pull_request_review:
-    types: [submitted, dismissed]
-
-  pull_request:
-    types: [synchronize]
+    types: [submitted]
 
 permissions:
   contents: write
   pull-requests: write
 
-concurrency:
-  group: qa-auto-merge
-  cancel-in-progress: false
-
 jobs:
-  check-and-merge:
+  auto-merge:
+    if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check and merge QA PRs
+      - name: Check and merge approved PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
         run: |
-          echo "Checking all PRs with qa-auto-merge label..."
+          PR_NUMBER=${{ github.event.pull_request.number }}
 
-          PRS=$(gh pr list \
+          echo "Checking PR #$PR_NUMBER"
+
+          REVIEW_DECISION=$(gh pr view "$PR_NUMBER" \
             --repo "${{ github.repository }}" \
-            --state open \
-            --limit 100 \
-            --json number,reviewDecision, mergeable)
+            --json reviewDecision \
+            --jq '.reviewDecision')
 
-          echo "$PRS" | jq .
+          MERGEABLE=$(gh pr view "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --json mergeable \
+            --jq '.mergeable')
 
-          TOTAL=$(echo "$PRS" | jq 'length')
+          echo "Review decision: $REVIEW_DECISION"
+          echo "Mergeable: $MERGEABLE"
 
-          if [ "$TOTAL" -eq 0 ]; then
-            echo "No QA PRs found."
+          if [ "$REVIEW_DECISION" != "APPROVED" ]; then
+            echo "❌ PR is not approved."
             exit 0
           fi
 
-          NOT_APPROVED=$(echo "$PRS" | jq \
-            '[.[] | select(.reviewDecision != "APPROVED")] | length')
-
-          NOT_MERGEABLE=$(echo "$PRS" | jq \
-            '[.[] | select(.mergeable != "MERGEABLE")] | length')
-
-          echo "Total PRs: $TOTAL"
-          echo "Not approved: $NOT_APPROVED"
-          echo "Not mergeable: $NOT_MERGEABLE"
-
-          if [ "$NOT_APPROVED" -gt 0 ]; then
-            echo "❌ Not all PRs are approved."
-            echo "❌ No PRs will be merged."
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "❌ PR is not mergeable."
             exit 0
           fi
 
-          if [ "$NOT_MERGEABLE" -gt 0 ]; then
-            echo "❌ Not all PRs are mergeable."
-            echo "❌ No PRs will be merged."
-            exit 0
-          fi
+          echo "✅ PR #$PR_NUMBER is approved and mergeable."
+          echo "🚀 Merging PR #$PR_NUMBER..."
 
-          echo "✅ ALL PRs are approved."
-          echo "✅ ALL PRs are mergeable."
-          echo "🚀 Starting batch merge..."
+          gh pr merge "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --merge \
+            --delete-branch
 
-          echo "$PRS" | jq -r '.[].number' | while read PR_NUMBER; do
-
-            echo "Merging PR #$PR_NUMBER..."
-
-            gh pr merge "$PR_NUMBER" \
-              --repo "${{ github.repository }}" \
-              --merge \
-              --delete-branch
-
-            echo "✅ PR #$PR_NUMBER merged."
-
-          done
+          echo "✅ PR #$PR_NUMBER merged successfully."
