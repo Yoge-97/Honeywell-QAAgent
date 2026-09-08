@@ -1,11 +1,12 @@
 name: QA Auto Merge
 
 on:
-  workflow_dispatch:
+  pull_request_review:
+    types: [submitted]
 
 permissions:
-  pull-requests: read
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   check-approvals:
