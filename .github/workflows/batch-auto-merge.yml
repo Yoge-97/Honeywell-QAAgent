@@ -29,10 +29,9 @@ jobs:
 
           PRS=$(gh pr list \
             --repo "${{ github.repository }}" \
-            --label "qa-auto-merge" \
             --state open \
             --limit 100 \
-            --json number,reviewDecision,mergeable)
+            --json number,reviewDecision, mergeable)
 
           echo "$PRS" | jq .
 
