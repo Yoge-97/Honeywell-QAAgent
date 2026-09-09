@@ -54,3 +54,62 @@ jobs:
             --delete-branch
 
           echo "✅ PR #$PR_NUMBER merged successfully."
+
+      - name: Send merge notification email
+        if: success()
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ASSIGNEE_EMAIL: ${{ secrets.ASSIGNEE_EMAIL }}
+
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          from email.message import EmailMessage
+
+          email = EmailMessage()
+
+          email["From"] = os.environ["SMTP_USERNAME"]
+          email["To"] = os.environ["ASSIGNEE_EMAIL"]
+          email["Subject"] = (
+              f"PR #{os.environ['PR_NUMBER']} Automatically Merged"
+          )
+
+          email.set_content(
+              f"Hello,\n\n"
+              f"The Pull Request has been automatically merged successfully.\n\n"
+              f"PR Number: #{os.environ['PR_NUMBER']}\n"
+              f"PR Title: {os.environ['PR_TITLE']}\n"
+              f"Pull Request: {os.environ['PR_URL']}\n"
+              f"Source Branch: {os.environ['SOURCE_BRANCH']}\n"
+              f"Target Branch: {os.environ['TARGET_BRANCH']}\n\n"
+              f"Status: MERGED\n\n"
+              f"Regards,\n"
+              f"QA Creator Agent"
+          )
+
+          with smtplib.SMTP(
+              os.environ["SMTP_HOST"],
+              int(os.environ["SMTP_PORT"])
+          ) as server:
+
+              server.starttls()
+
+              server.login(
+                  os.environ["SMTP_USERNAME"],
+                  os.environ["SMTP_PASSWORD"]
+              )
+
+              server.send_message(email)
+
+          print("📧 Merge notification email sent successfully.")
+          PY
