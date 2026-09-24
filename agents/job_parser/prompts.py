@@ -7,6 +7,8 @@ Rules:
 - Only use information that is written in the job description. Never invent details.
 - If a field is not present, leave it empty (or null for numbers).
 - List each skill as a short separate item, e.g. "Kubernetes", "AWS", not a sentence.
+- When the job accepts alternatives ("X or Y"), keep them together as ONE item,
+  e.g. "FastAPI or Django", "GitHub Actions or Jenkins". Do not split them.
 - Put skills under "requirements" / "must have" in required_skills.
 - Put skills under "nice to have" / "preferred" / "bonus" in preferred_skills.
 - Put degrees and certifications in required_qualifications, not in the skill lists.

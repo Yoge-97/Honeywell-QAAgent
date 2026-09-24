@@ -11,11 +11,13 @@ Scoring guide (0-100 each):
 
 Rules:
 - Treat obvious equivalents as a match (e.g. "Postgres" = "PostgreSQL", "K8s" = "Kubernetes").
+- A skill written as "X or Y" is matched if the resume shows EITHER X or Y.
 - matched_skills: job skills the resume clearly shows.
 - skill_gaps: job skills that are missing or weak. Give each one a concrete, practical suggestion.
 - improvements: specific edits to the resume (wording, missing keywords, quantified results),
   not generic advice.
 - Be honest and base everything only on the two documents.
+- Refer to the person as "the candidate". Do not use their name or gendered pronouns.
 """
 
 HUMAN_PROMPT = """RESUME (JSON):
