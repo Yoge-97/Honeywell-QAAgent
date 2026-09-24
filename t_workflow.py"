@@ -1,0 +1,25 @@
+[33mcommit 7d5c0421baf1675c19edfea165586e520bd240eb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/resume-creator[m[33m)[m
+Author: Kiruthika <kiruthika.y@knackforge.com>
+Date:   Thu Sep 24 18:06:06 2026 +0530
+
+    Add resume upload and text extraction
+
+[33mcommit b08da1e3db950b6621c6b03a70e7eecf89dfd1e1[m
+Author: Kiruthika <kiruthika.y@knackforge.com>
+Date:   Thu Sep 24 16:05:44 2026 +0530
+
+    Agent host session ff5b5d88-8afd-41c9-945c-3526ef4d2d28 - turn 3 start
+
+[33mcommit 062a61ada6f8ef3d8902e151960848d5c5ac9f12[m
+Author: Kiruthika <kiruthika.y@knackforge.com>
+Date:   Thu Sep 24 15:25:55 2026 +0530
+
+    Agent host session ff5b5d88-8afd-41c9-945c-3526ef4d2d28 - baseline checkpoint
+
+[33mcommit cde9d364e141d3e8396f83655da3ee1944fa946b[m
+Author: Vishal Ajai Rosen V <vishal.v@knackforge.com>
+Date:   Thu Sep 24 12:21:16 2026 +0530
+
+    Add resume analyzer scaffold: shared models, Groq LLM service, LangGraph workflow, agent stubs
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
