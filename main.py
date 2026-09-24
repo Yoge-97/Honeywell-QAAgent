@@ -7,6 +7,7 @@ Usage:
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from graph.workflow import run_analysis
@@ -40,6 +41,7 @@ def print_report(analysis: Analysis) -> None:
 
 
 def main() -> None:
+    sys.stdout.reconfigure(encoding="utf-8")  # LLM output may contain non-ASCII characters
     parser = argparse.ArgumentParser(description="Analyze a resume against a job description.")
     parser.add_argument("--resume", required=True, help="Path to a .txt file with the resume")
     parser.add_argument("--job", required=True, help="Path to a .txt file with the job description")
