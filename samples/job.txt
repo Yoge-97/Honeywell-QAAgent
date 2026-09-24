@@ -1,0 +1,23 @@
+Senior Python Engineer - CloudScale Systems (Remote, Full-time)
+
+About the role
+We are looking for a Senior Python Engineer to design and scale our cloud-native backend services.
+
+Responsibilities
+- Design and build microservices in Python
+- Own CI/CD pipelines and deployments on Kubernetes
+- Mentor junior engineers and review code
+
+Requirements
+- 5+ years of professional Python experience
+- Strong experience with FastAPI or Django
+- Kubernetes and Docker
+- AWS (EC2, S3, Lambda)
+- PostgreSQL
+- CI/CD (GitHub Actions or Jenkins)
+- Bachelor's degree in Computer Science or related field
+
+Nice to have
+- Kafka or other message queues
+- Terraform
+- Experience with LLM / GenAI applications

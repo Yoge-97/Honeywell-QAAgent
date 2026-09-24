@@ -1,0 +1,24 @@
+Priya Sharma
+priya.sharma@example.com | +1 555 010 2233 | Austin, TX
+
+SUMMARY
+Backend engineer with 4 years of experience building Python APIs and data pipelines.
+
+SKILLS
+Python, FastAPI, Flask, PostgreSQL, Docker, Git, REST APIs, Pandas, Linux
+
+EXPERIENCE
+Software Engineer - DataBridge Inc. (Mar 2022 - Present)
+- Built and maintained REST APIs in FastAPI serving 2M requests/day
+- Cut report generation time by 60% by rewriting Pandas jobs
+- Containerized 12 services with Docker
+
+Junior Developer - WebNest LLC (Jun 2020 - Feb 2022)
+- Developed Flask apps backed by PostgreSQL
+- Wrote unit tests with pytest, raising coverage from 40% to 80%
+
+EDUCATION
+B.S. Computer Science - University of Texas at Austin (2020)
+
+CERTIFICATIONS
+AWS Certified Cloud Practitioner
