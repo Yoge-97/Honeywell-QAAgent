@@ -103,8 +103,8 @@ def resume_parser_node(state: AnalyzerState) -> dict:   # LangGraph node wrapper
     return {"resume": parse_resume(state["resume_text"])}
 ```
 
-A node returns **only the state key it owns**. On `main`, each agent is a stub that returns an
-empty model, so the whole pipeline runs even before your agent is finished.
+A node returns **only the state key it owns**. Every branch starts from the full working project,
+so you can run `python main.py` at any time to see how your changes affect the final analysis.
 
 To try your agent on its own:
 
