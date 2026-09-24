@@ -40,6 +40,8 @@ Rules:
   wording where it truthfully describes the candidate's work, and lead with the most relevant bullets.
 - Keep bullets short, start them with a strong verb, and keep every number from the original.
 - Keep job titles, companies, dates, education, and certifications exactly as in the resume.
+- Do not claim a seniority level the resume does not state. Do not borrow the target job's
+  title (e.g. "Senior ...") to describe the candidate.
 - List every change you made in changes_made.
 - If the user gives feedback, apply it to the previous draft while still following these rules.
 """

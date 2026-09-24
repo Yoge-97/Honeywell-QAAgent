@@ -56,8 +56,8 @@ from models.resume import Resume
 
 
 @pytest.fixture
-def graph(monkeypatch, tmp_path):
-    """The real graph, with every LLM call replaced by a fake."""
+def fake_agents(monkeypatch, tmp_path):
+    """Replace every LLM call with a fake. Returns the list of feedback the tailor received."""
     tailor_calls = []
 
     def fake_tailor(resume, job, analysis, feedback="", previous=None):
@@ -69,9 +69,14 @@ def graph(monkeypatch, tmp_path):
     monkeypatch.setattr(analyzer_agent, "analyze", lambda resume, job: Analysis(overall_score=70))
     monkeypatch.setattr(tailor, "tailor_resume", fake_tailor)
     monkeypatch.setattr(export, "OUTPUT_DIR", tmp_path)
+    return tailor_calls
 
+
+@pytest.fixture
+def graph(fake_agents):
+    """The real graph, running on fake agents."""
     graph = build_graph()
-    graph.tailor_calls = tailor_calls
+    graph.tailor_calls = fake_agents
     return graph
 
 
@@ -130,3 +135,27 @@ def test_revision_limit(graph, monkeypatch):
 
     assert graph.tailor_calls == ["", "one"]  # the second revise was refused
     assert pending(result)["type"] == "human_review"
+
+
+# ---------- Streamlit UI (clicked through with AppTest, fake agents) ----------
+
+from streamlit.testing.v1 import AppTest
+
+
+def test_streamlit_edit_and_approve(fake_agents):
+    app = AppTest.from_file("../agents/resume_analyzer/app.py", default_timeout=30).run()
+
+    app.button(key="analyze").click().run()
+    assert app.metric[0].value == "70/100"
+
+    app.button(key="tailor_yes").click().run()
+    summary_box = next(box for box in app.text_area if box.label == "Summary")
+    assert summary_box.value == "draft 1"
+
+    summary_box.set_value("my own words").run()
+    app.button(key="approve").click().run()
+
+    assert not app.exception
+    assert app.success[0].value == "Your tailored resume is ready."
+    exported = app.session_state.result["tailored_resume"]
+    assert exported.summary == "my own words"  # unsaved edits were kept on approve

@@ -75,7 +75,17 @@ python main.py
 ```
 
 This analyzes `samples/resume.txt` against `samples/job.txt` and prints the result as JSON.
+It then asks whether to create a tailored resume, lets you approve, edit, or revise it,
+and saves it to `output/` as DOCX and PDF.
 To use your own files, change `RESUME_FILE` and `JOB_FILE` at the top of `main.py`.
+
+For the browser version with live editing:
+
+```bash
+streamlit run agents/resume_analyzer/app.py
+```
+
+See [agents/resume_analyzer/README.md](agents/resume_analyzer/README.md) for how this works.
 
 Run the tests (these don't call the LLM, so no API key is needed):
 
