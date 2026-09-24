@@ -70,12 +70,22 @@ Then open `.env` and set `GROQ_API_KEY`. You can get a free key at <https://cons
 
 ## Run
 
+### CLI pipeline
+
 ```bash
 python main.py
 ```
 
 This analyzes `samples/resume.txt` against `samples/job.txt` and prints the result as JSON.
 To use your own files, change `RESUME_FILE` and `JOB_FILE` at the top of `main.py`.
+
+### Streamlit resume upload UI
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Upload a PDF or DOCX resume, the app extracts the text, sends it to the existing resume analyzer, and displays the result in the browser.
 
 Run the tests (these don't call the LLM, so no API key is needed):
 
