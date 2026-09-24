@@ -41,7 +41,7 @@ graph/state.py       AnalyzerState passed between agents                (shared)
 graph/workflow.py    LangGraph wiring                                   (shared)
 samples/             Example resume and job description
 tests/               pytest tests
-main.py              CLI entry point
+main.py              Runs the whole pipeline and prints the result
 ```
 
 ## Setup
@@ -71,9 +71,11 @@ Then open `.env` and set `GROQ_API_KEY`. You can get a free key at <https://cons
 ## Run
 
 ```bash
-python main.py --resume samples/resume.txt --job samples/job.txt
-python main.py --resume samples/resume.txt --job samples/job.txt --json   # full output
+python main.py
 ```
+
+This analyzes `samples/resume.txt` against `samples/job.txt` and prints the result as JSON.
+To use your own files, change `RESUME_FILE` and `JOB_FILE` at the top of `main.py`.
 
 Run the tests (these don't call the LLM, so no API key is needed):
 
