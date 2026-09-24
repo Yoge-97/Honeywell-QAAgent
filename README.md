@@ -76,7 +76,7 @@ python main.py
 
 This analyzes `samples/resume.txt` against `samples/job.txt` and prints the result as JSON.
 It then asks whether to create a tailored resume, lets you approve, edit, or revise it,
-and saves it to `output/` as DOCX and PDF.
+and asks whether to save it to `output/` as DOCX and PDF.
 To use your own files, change `RESUME_FILE` and `JOB_FILE` at the top of `main.py`.
 
 For the browser version with live editing:

@@ -10,7 +10,7 @@ DRAFT_FILE = Path("output/draft.json")
 
 def answer_interrupt(payload: dict):
     """Show a paused graph's question in the terminal and return the user's answer."""
-    if payload["type"] == "ask_to_tailor":
+    if payload["type"] in ("ask_to_tailor", "ask_to_export"):  # yes/no questions
         return input(f"\n{payload['question']} [y/n] > ").strip().lower().startswith("y")
     return review_in_terminal(payload)
 

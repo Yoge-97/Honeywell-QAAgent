@@ -117,11 +117,28 @@ def test_revise_edit_approve_export(graph):
     assert pending(result)["tailored_resume"]["summary"] == "my own words"
     assert len(graph.tailor_calls) == 2
 
-    # approve -> exported
+    # approve -> asked whether to export
     result = graph.invoke(Command(resume={"action": "approve"}), config)
+    assert pending(result)["type"] == "ask_to_export"
+
+    # yes -> exported
+    result = graph.invoke(Command(resume=True), config)
     assert "__interrupt__" not in result
     assert result["tailored_resume"].summary == "my own words"
     assert set(result["export_paths"]) == {"docx", "pdf"}
+
+
+def test_user_declines_export(graph):
+    config = new_session()
+    graph.invoke({"resume_text": "r", "job_text": "j"}, config)
+    graph.invoke(Command(resume=True), config)
+    graph.invoke(Command(resume={"action": "approve"}), config)
+
+    result = graph.invoke(Command(resume=False), config)
+
+    assert "__interrupt__" not in result
+    assert result["tailored_resume"].summary == "draft 1"  # approved resume is kept
+    assert "export_paths" not in result
 
 
 def test_revision_limit(graph, monkeypatch):
@@ -154,6 +171,7 @@ def test_streamlit_edit_and_approve(fake_agents):
 
     summary_box.set_value("my own words").run()
     app.button(key="approve").click().run()
+    app.button(key="export_yes").click().run()
 
     assert not app.exception
     assert app.success[0].value == "Your tailored resume is ready."

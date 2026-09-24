@@ -7,6 +7,7 @@ Each agent reads the keys it needs and returns only the key it owns:
     ask_to_tailor   -> "tailor"
     resume_tailor   -> "tailored_resume"
     human_review    -> "tailored_resume" (user edits), "feedback", "revision_count"
+    ask_to_export   -> "export"
     exporter        -> "export_paths"
 """
 
@@ -28,4 +29,5 @@ class AnalyzerState(TypedDict, total=False):
     tailored_resume: TailoredResume  # set by resume_tailor, or by human_review when the user edits it
     feedback: str  # set by human_review: the user's latest revision request
     revision_count: int  # set by human_review: how many times the user asked for a rewrite
+    export: bool  # set by ask_to_export: does the user want the files?
     export_paths: dict[str, str]  # set by exporter: {"docx": path, "pdf": path}

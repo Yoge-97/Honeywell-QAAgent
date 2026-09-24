@@ -135,7 +135,7 @@ if question and question["type"] == "human_review":
     save, approve = st.columns(2)
     if save.button("Save edits", key="save", disabled=edited == draft):
         run(Command(resume={"action": "edit", "tailored_resume": edited.model_dump()}))
-    if approve.button("Approve & export", type="primary", key="approve"):
+    if approve.button("Approve", type="primary", key="approve"):
         if edited != draft:  # keep unsaved edits
             st.session_state.graph.invoke(
                 Command(resume={"action": "edit", "tailored_resume": edited.model_dump()}),
@@ -151,7 +151,19 @@ if question and question["type"] == "human_review":
     if st.button("Regenerate with feedback", key="revise", disabled=revisions_left <= 0 or not feedback):
         run(Command(resume={"action": "revise", "feedback": feedback}))
 
-# ---------- 5. Download ----------
+# ---------- 5. Export? ----------
+if question and question["type"] == "ask_to_export":
+    st.header(question["question"])
+    yes, no = st.columns(2)
+    if yes.button("Yes, export", type="primary", key="export_yes"):
+        run(Command(resume=True))
+    if no.button("No, I'm done", key="export_no"):
+        run(Command(resume=False))
+
+if result.get("export") is False:
+    st.info("Tailored resume approved. No files were exported.")
+
+# ---------- 6. Download ----------
 if "export_paths" in result:
     st.success("Your tailored resume is ready.")
     docx_path = Path(result["export_paths"]["docx"])

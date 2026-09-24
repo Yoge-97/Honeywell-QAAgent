@@ -18,10 +18,13 @@ resume_analyzer ──> ask_to_tailor ──no──> END
                    │  ▲    │
              edit  └──┘    │ approve
                            ▼
+                     ask_to_export ──no──> END
+                           │ yes
+                           ▼
                        exporter ──> output/tailored_resume.docx + .pdf
 ```
 
-`ask_to_tailor` and `human_review` **pause** the graph with LangGraph's `interrupt()`.
+`ask_to_tailor`, `human_review` and `ask_to_export` **pause** the graph with LangGraph's `interrupt()`.
 The checkpointer keeps the state while it waits. The caller shows the question to the user and
 continues with `graph.invoke(Command(resume=answer), config)` using the same `config` (thread id).
 
@@ -31,6 +34,7 @@ continues with `graph.invoke(Command(resume=answer), config)` using the same `co
 | `human_review` | `{"action": "approve"}` |
 | | `{"action": "edit", "tailored_resume": {...}}` — saved as-is, no LLM call |
 | | `{"action": "revise", "feedback": "..."}` — the tailor rewrites the draft |
+| `ask_to_export` | `True` (save DOCX + PDF) or `False` (finish without files) |
 
 ## Files
 
@@ -38,7 +42,7 @@ continues with `graph.invoke(Command(resume=answer), config)` using the same `co
 | --- | --- |
 | `agent.py` | `analyze()`: scores, matched skills, skill gaps, improvements |
 | `tailor.py` | `tailor_resume()`: rewrites the resume for the job. Never invents facts |
-| `review.py` | The two pause points and the approve / edit / revise routing |
+| `review.py` | The three pause points and the approve / edit / revise routing |
 | `export.py` | `to_docx()`, `to_pdf()`: plain Python, no LLM |
 | `models.py` | `TailoredResume`, `TailoredExperience` |
 | `prompts.py` | Prompts for the analyzer and the tailor |
@@ -66,7 +70,7 @@ If you change `TAILOR_SYSTEM_PROMPT`, check a few outputs for invented claims.
 
 Flag these in the PR, because the other agents depend on them:
 
-- `graph/state.py`: new keys `tailor`, `tailored_resume`, `feedback`, `revision_count`, `export_paths`
+- `graph/state.py`: new keys `tailor`, `tailored_resume`, `feedback`, `revision_count`, `export`, `export_paths`
 - `graph/workflow.py`: new nodes, a checkpointer, and `new_session()`
 - `main.py`: the pause/answer loop
 - `requirements.txt`: `python-docx`, `fpdf2`, `streamlit`

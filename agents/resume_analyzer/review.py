@@ -47,7 +47,7 @@ def human_review_node(state: AnalyzerState) -> Command:
     action = decision.get("action")
 
     if action == "approve":
-        return Command(goto="exporter")
+        return Command(goto="ask_to_export")
 
     if action == "edit":
         edited = TailoredResume(**decision["tailored_resume"])
@@ -61,3 +61,16 @@ def human_review_node(state: AnalyzerState) -> Command:
 
     # Unknown action, or no revisions left: show the same draft again.
     return Command(goto="human_review")
+
+
+def ask_to_export_node(state: AnalyzerState) -> dict:
+    """Pause after approval and ask whether to save the resume as DOCX and PDF.
+
+    Expected answer: True or False.
+    """
+    answer = interrupt({"type": "ask_to_export", "question": "Export the tailored resume as DOCX and PDF?"})
+    return {"export": bool(answer)}
+
+
+def route_after_export_question(state: AnalyzerState) -> str:
+    return "exporter" if state.get("export") else END

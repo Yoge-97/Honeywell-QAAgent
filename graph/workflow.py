@@ -11,9 +11,12 @@
                                            └──────────────── │
                                                              │ approve
                                                              ▼
+                                                       ask_to_export ──no──> END
+                                                             │ yes
+                                                             ▼
                                                          exporter ──> END
 
-The two parsers run in parallel. ask_to_tailor and human_review pause the graph
+The two parsers run in parallel. ask_to_tailor, human_review and ask_to_export pause the graph
 and wait for the user (see agents/resume_analyzer/review.py).
 """
 
@@ -26,7 +29,13 @@ from langgraph.graph import END, START, StateGraph
 from agents.job_parser.agent import job_parser_node
 from agents.resume_analyzer.agent import resume_analyzer_node
 from agents.resume_analyzer.export import exporter_node
-from agents.resume_analyzer.review import ask_to_tailor_node, human_review_node, route_after_ask
+from agents.resume_analyzer.review import (
+    ask_to_export_node,
+    ask_to_tailor_node,
+    human_review_node,
+    route_after_ask,
+    route_after_export_question,
+)
 from agents.resume_analyzer.tailor import resume_tailor_node
 from agents.resume_parser.agent import resume_parser_node
 from graph.state import AnalyzerState
@@ -49,8 +58,9 @@ def build_graph():
     graph.add_node("ask_to_tailor", ask_to_tailor_node)
     graph.add_node("resume_tailor", resume_tailor_node)
     graph.add_node(
-        "human_review", human_review_node, destinations=("resume_tailor", "human_review", "exporter")
+        "human_review", human_review_node, destinations=("resume_tailor", "human_review", "ask_to_export")
     )
+    graph.add_node("ask_to_export", ask_to_export_node)
     graph.add_node("exporter", exporter_node)
 
     graph.add_edge(START, "resume_parser")
@@ -60,6 +70,7 @@ def build_graph():
     graph.add_conditional_edges("ask_to_tailor", route_after_ask, ["resume_tailor", END])
     graph.add_edge("resume_tailor", "human_review")
     # human_review picks its own next step (see review.py), so it has no fixed edge.
+    graph.add_conditional_edges("ask_to_export", route_after_export_question, ["exporter", END])
     graph.add_edge("exporter", END)
 
     # The checkpointer saves the state while the graph is paused, so it can continue later.

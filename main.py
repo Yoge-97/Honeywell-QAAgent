@@ -34,10 +34,12 @@ result = graph.invoke({"resume_text": resume_text, "job_text": job_text}, config
 # 3. Print the analysis
 print(result["analysis"].model_dump_json(indent=2))
 
-# 4. The graph pauses when it needs you (tailor? approve/edit/revise?). Answer until it finishes.
+# 4. The graph pauses when it needs you (tailor? approve/edit/revise? export?). Answer until it finishes.
 while "__interrupt__" in result:
     answer = answer_interrupt(result["__interrupt__"][0].value)
     result = graph.invoke(Command(resume=answer), config)
 
 if "export_paths" in result:
     print(f"\nSaved: {result['export_paths']['docx']} and {result['export_paths']['pdf']}")
+elif result.get("tailored_resume"):
+    print("\nTailored resume approved. No files were exported.")
