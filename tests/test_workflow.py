@@ -10,7 +10,11 @@ from models.resume import Resume
 
 
 def test_pipeline_passes_data_between_agents(monkeypatch):
-    monkeypatch.setattr(resume_agent, "parse_resume", lambda text: Resume(full_name=text))
+    async def accept_resume(_text):
+        return resume_agent.ResumeValidation(is_resume=True, reason="Synthetic resume.")
+
+    monkeypatch.setattr(resume_agent, "validate_resume", accept_resume)
+    monkeypatch.setattr(resume_agent, "parse_resume", lambda text: Resume(full_name="Alice"))
     monkeypatch.setattr(job_agent, "parse_job", lambda text: Job(title=text))
     monkeypatch.setattr(
         analyzer_agent,
@@ -18,8 +22,12 @@ def test_pipeline_passes_data_between_agents(monkeypatch):
         lambda resume, job: Analysis(summary=f"{resume.full_name} vs {job.title}"),
     )
 
-    result = run_analysis("Alice", "Engineer")
+    result = run_analysis("Alice resume: experience and skills", "Engineer")
 
     assert result["resume"].full_name == "Alice"
+    assert result["resume_validation"] == {
+        "is_resume": True,
+        "reason": "Synthetic resume.",
+    }
     assert result["job"].title == "Engineer"
     assert result["analysis"].summary == "Alice vs Engineer"

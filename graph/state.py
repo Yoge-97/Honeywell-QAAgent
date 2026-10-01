@@ -14,8 +14,9 @@ from models.resume import Resume
 
 
 class AnalyzerState(TypedDict, total=False):
-    resume_text: str  # input
+    resume_text: str | dict[str, object]  # input text or file-and-text mapping
     job_text: str  # input
     resume: Resume  # set by resume_parser
+    resume_validation: dict[str, bool | str]  # set by resume_parser
     job: Job  # set by job_parser
     analysis: Analysis  # set by resume_analyzer

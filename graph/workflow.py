@@ -30,6 +30,6 @@ def build_graph():
     return graph.compile()
 
 
-def run_analysis(resume_text: str, job_text: str) -> AnalyzerState:
+def run_analysis(resume_text: str | dict[str, object], job_text: str) -> AnalyzerState:
     """Run the full pipeline and return the final state."""
     return build_graph().invoke({"resume_text": resume_text, "job_text": job_text})
